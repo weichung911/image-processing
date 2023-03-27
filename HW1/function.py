@@ -7,8 +7,6 @@ def rotate(img,theta=int):
     height, width, channel = img.shape
     new_height = math.ceil((width*math.sin(theta))+(height*math.cos(theta)))
     new_width = math.ceil((width*math.cos(theta))+(height*math.sin(theta)))
-    print(height,new_height)
-    print(width,new_width)
     new_img = np.zeros((new_height,new_width,channel))
     for x in range(width):
         for y in range(height):
@@ -18,4 +16,39 @@ def rotate(img,theta=int):
                 new_img[y_,x_] = img[y,x]
     new_img = new_img.astype(np.uint8)
     
+    return new_img
+
+def bilinear_resize(img, new_height=int, new_width=int):
+    height, width, channel = img.shape
+    new_img = np.zeros((new_height,new_width,channel))
+    h_scale_factor = height/new_height if new_height != 0 else 0
+    w_scale_factor = width/new_width if new_width != 0 else 0
+    for h in range(new_height):
+        for w in range(new_width):
+            x = w * w_scale_factor
+            y = h * h_scale_factor
+
+            x_floor = math.floor(x)
+            x_ceil = min(width-1,math.ceil(x))
+            y_floor = math.floor(y)
+            y_ceil = min(height-1,math.ceil(y))
+            if (y_ceil == y_floor) & (x_ceil == x_floor):
+                q = img[int(y),int(x), :]
+            elif(y_ceil == y_floor):
+                q1 = img[int(y),int(x_ceil), :]
+                q2 = img[int(y),int(x_floor), :]
+                q = (q1 * (x_ceil - x )) + (q2 * (x - x_floor))
+            elif(x_ceil == x_floor):
+                q1 = img[int(y_ceil),int(x), :]
+                q2 = img[int(y_floor),int(x), :]
+            else:
+                v1 = img[y_floor,x_floor, :]
+                v2 = img[y_floor,x_ceil, :]
+                v3 = img[y_ceil,x_floor, :]
+                v4 = img[y_ceil,x_ceil, :]
+                q1 = (v1 * (x_ceil -x)) + (v2 * (x - x_floor))
+                q2 = (v3 * (x_ceil - x)) + (v4 * (x - x_floor))
+                q = (q1 * (y_ceil - y)) + (q2 * (y - y_floor))
+            new_img[h,w,:] = q
+    new_img = new_img.astype(np.uint8)
     return new_img

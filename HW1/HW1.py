@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np 
-from  function import rotate
+from  function import rotate, bilinear_resize
 
 laptop_left = cv.imread('laptop_left.png')
 laptop_right = cv.imread('laptop_right.png')
@@ -20,4 +20,11 @@ cv.imshow('laptop',laptop)
 
 new_img = rotate(laptop,35)
 cv.imshow('new_img',new_img)
+
+lena = cv.imread('lena.bmp')
+print(lena.shape)
+cv.imshow('original_lena',lena)
+resize_lena = bilinear_resize(lena,1024,1024)
+print(resize_lena.shape)
+cv.imshow('resize_lena',resize_lena)
 cv.waitKey(0)
