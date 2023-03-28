@@ -14,6 +14,17 @@ def rotate(img,theta=int):
             y_ = int(x*math.sin(theta)+y*math.cos(theta))
             if x_ <= new_width & y_ <= new_height:
                 new_img[y_,x_] = img[y,x]
+    for h in range(1,new_height-1):
+        for w in range(1,new_width-1):
+            if (new_img[h,w] == [0,0,0]).all():
+                v1 = new_img[h-1,w]
+                # v2 = new_img[h+1,w]
+                # v3 = new_img[h,w+1]
+                # v4 = new_img[h,w-1]
+                # new_img[h,w,:] = (v1+v2+v3+v4)/4
+                new_img[h,w,:] = v1
+
+
     new_img = new_img.astype(np.uint8)
     
     return new_img
