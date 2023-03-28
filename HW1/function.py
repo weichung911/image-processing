@@ -52,3 +52,13 @@ def bilinear_resize(img, new_height=int, new_width=int):
             new_img[h,w,:] = q
     new_img = new_img.astype(np.uint8)
     return new_img
+
+def overlay(img1,img2):
+    height_1, width_1,= img1.shape[0], img1.shape[1]
+    for h in range(height_1):
+        for w in range(width_1):
+            if (img1[h,w,:] != [255,255,255]).all():
+                img2[h,w,:] = img1[h,w,:]
+    
+    img2 = img2.astype(np.uint8)
+    return img2

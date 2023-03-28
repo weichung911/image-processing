@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np 
-from  function import rotate, bilinear_resize
+from  function import rotate, bilinear_resize, overlay
 
 laptop_left = cv.imread('laptop_left.png')
 laptop_right = cv.imread('laptop_right.png')
@@ -27,4 +27,8 @@ cv.imshow('original_lena',lena)
 resize_lena = bilinear_resize(lena,1024,1024)
 print(resize_lena.shape)
 cv.imshow('resize_lena',resize_lena)
+
+graveler = cv.imread('graveler.bmp')
+graveler_lena = overlay(graveler,lena)
+cv.imshow('gravelr_lena',graveler_lena)
 cv.waitKey(0)
