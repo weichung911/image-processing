@@ -150,4 +150,48 @@ def LSB_Decode(img):
     watermark_img = watermark_img.astype(np.uint8)
     return watermark_img
 
+def LSB_Decode_jpeg(img):
+    height, width, channel = img.shape
+    watermark = []
+    for c in range(channel):
+        li = []
+        watermark_h = 0
+        watermark_w = 0
+        break_flag = False
+        b_tmp = ''
+        for h in range(height):
+            for w in range(width):
+                if len(b_tmp) != 7:
+                    tmp = intto8binary(img[h,w,c])
+                    b_tmp = b_tmp + tmp[7]
+                else:
+                    tmp = intto8binary(img[h,w,c])
+                    b_tmp = b_tmp + tmp[7]
+                    if watermark_h == 0:
+                        watermark_h = 53
+                    elif watermark_w == 0:
+                        watermark_w = 104
+                    elif (watermark_h*watermark_w) > (len(li)):
+                        li.append(binary2int(b_tmp))
+                    else:
+                        break_flag = True
+                    b_tmp = ''
+                if break_flag:
+                    break
+            if break_flag:
+                break
+        watermark.append(np.array(li).reshape(watermark_h,watermark_w))
+    watermark_img = cv.merge((watermark[0], watermark[1], watermark[2]))
+    watermark_img = watermark_img.astype(np.uint8)
+    return watermark_img
+
+def PSNR(img1,img2):
+    mse = np.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return float('inf')
+    max_value = 255.0
+    psnr = 10 * np.log10((max_value ** 2) / mse)
+    return psnr
+
+
 
