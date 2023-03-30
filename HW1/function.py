@@ -71,3 +71,83 @@ def overlay(img1,img2):
     
     img2 = img2.astype(np.uint8)
     return img2
+
+def intto8binary(n=int):
+    return'{0:08b}'.format(n)
+def binary2int(n=bytes):
+    return int(n,2)
+def li_reverse(li):
+    new_li = []
+    while (li != []):
+        new_li.append(li.pop())
+    return new_li
+def LSB_encode(img1,img2):
+    height, width, channel = img2.shape
+    img1_h, img1_w = img1.shape[0], img1.shape[1]
+    new_img = img2.copy()
+    for c in range(channel):
+        li = []
+        li.append(intto8binary(img1_h))
+        li.append(intto8binary(img1_w))
+        for h in range(img1_h):
+            for w in range(img1_w):
+                li.append(intto8binary(img1[h,w,c]))
+        li.append('@')
+        li = li_reverse(li)
+        b_tmp = li.pop()
+        counter = 0
+        for h in range(height):
+            for w in range(width):
+                if b_tmp == '@':
+                    break 
+                if counter != 7:
+                    tmp = intto8binary(new_img[h,w,c])
+                    tmp = tmp[:7] + b_tmp[counter]
+                    new_img[h,w,c] = binary2int(tmp)
+                    counter += 1
+                else:
+                    tmp = intto8binary(new_img[h,w,c])
+                    tmp = tmp[:7] + b_tmp[counter]
+                    new_img[h,w,c] = binary2int(tmp)
+                    counter = 0
+                    b_tmp = li.pop()
+            if b_tmp == '@':
+                break
+    return new_img
+
+def LSB_Decode(img):
+    height, width, channel = img.shape
+    watermark = []
+    for c in range(channel):
+        li = []
+        watermark_h = 0
+        watermark_w = 0
+        break_flag = False
+        b_tmp = ''
+        for h in range(height):
+            for w in range(width):
+                if len(b_tmp) != 7:
+                    tmp = intto8binary(img[h,w,c])
+                    b_tmp = b_tmp + tmp[7]
+                else:
+                    tmp = intto8binary(img[h,w,c])
+                    b_tmp = b_tmp + tmp[7]
+                    if watermark_h == 0:
+                        watermark_h = binary2int(b_tmp)
+                    elif watermark_w == 0:
+                        watermark_w = binary2int(b_tmp)
+                    elif (watermark_h*watermark_w) > (len(li)):
+                        li.append(binary2int(b_tmp))
+                    else:
+                        break_flag = True
+                    b_tmp = ''
+                if break_flag:
+                    break
+            if break_flag:
+                break
+        watermark.append(np.array(li).reshape(watermark_h,watermark_w))
+    watermark_img = cv.merge((watermark[0], watermark[1], watermark[2]))
+    watermark_img = watermark_img.astype(np.uint8)
+    return watermark_img
+
+
