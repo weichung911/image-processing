@@ -25,6 +25,6 @@ two_HE = two_histogram_equalization(aerialview_img)
 cv.imshow('two_HE',two_HE)
 
 # 5
-enhance_einstein_img = enhance_contrast(einstein_img)
-cv.imshow('enhance_einstein_img',enhance_einstein_img)
+enhance_aerialview_img= enhance_contrast(aerialview_img)
+cv.imshow('enhance_einstein_img',enhance_aerialview_img)
 cv.waitKey(0)

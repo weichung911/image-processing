@@ -95,27 +95,35 @@ def two_histogram_equalization(image):
     return equalized_image
 
 def enhance_contrast(image):
-    # 計算直方圖
-    hist = np.zeros(256, dtype=np.float32)
+    # 定義窗口大小和半窗口大小
+    window_size = 7
+    half_window = window_size // 2
+
+    # 創建與原始圖像相同大小的輸出圖像
+    output_image = np.zeros_like(image)
+
+    # 迭代遍歷每個像素
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            pixel_value = image[i, j]
-            hist[pixel_value] += 1
+            # 提取局部窗口
+            window = image[max(i - half_window, 0):min(i + half_window + 1, image.shape[0]),
+                        max(j - half_window, 0):min(j + half_window + 1, image.shape[1])]
+            
+            # 計算局部窗口的直方圖
+            hist = [0] * 256
+            for pixel_value in window.flatten():
+                hist[pixel_value] += 1
+            
+            # 計算局部窗口的累積直方圖
+            cdf = [0] * 256
+            cdf[0] = hist[0]
+            for k in range(1, 256):
+                cdf[k] = cdf[k-1] + hist[k]
+            
+            # 計算增強函數
+            enhancement_func = int((cdf[int(image[i, j])] * 255) / cdf[-1])
+            
+            # 將增強後的像素值賦值給輸出圖像
+            output_image[i, j] = enhancement_func
 
-    # 正規化
-    hist /= image.size
-
-    # 計算enhancement函數
-    enhancement_func = np.zeros(256, dtype=np.float32)
-    for i in range(256):
-        enhancement_func[i] = np.sum(hist[:i+1])
-
-    # 對每個pixel 增強
-    enhanced_image = np.zeros_like(image, dtype=np.uint8)
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            pixel_value = image[i, j]
-            enhanced_pixel_value = np.round(255 * enhancement_func[pixel_value])
-            enhanced_image[i, j] = enhanced_pixel_value
-
-    return enhanced_image
+    return output_image.astype(np.uint8)
