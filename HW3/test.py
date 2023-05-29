@@ -1,48 +1,51 @@
-import numpy as np
-import cv2
+
 from function import *
+import numpy as np
+import scipy.ndimage
+import cv2
 
-def copy_padding(image, pad_size):
-    # 获取图像尺寸
-    height, width = image.shape[:2]
+# # 读取图像
+image = cv2.imread('peppers.bmp', 0)  # 以灰度模式读取图像
 
-    # 创建新的补齐图像
-    padded_image = np.zeros((height + 2*pad_size, width + 2*pad_size), dtype=image.dtype)
+if image is None:
+    print("Failed to load image")
+    exit()
+img = sobel_edge_detection(image)
+laplacian_noisy = cv2.Laplacian(img, cv2.CV_64F)
+cv2.imshow("image",image)
+cv2.imshow("img",img)
+cv2.imshow("lp",laplacian_noisy)
+# cv2.waitKey(0)
+def Sobel_edge_detection(f):
+    grad_x = cv2.Sobel(f, cv2.CV_32F, 1, 0, ksize = 3)
+    grad_y = cv2.Sobel(f, cv2.CV_32F, 0, 1, ksize = 3)
+    magnitude = abs(grad_x) + abs(grad_y)
+    g = np.uint8(np.clip(magnitude, 0, 255))
+    ret, g = cv2.threshold(g, 127, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    # 复制图像中心区域
-    padded_image[pad_size:height+pad_size, pad_size:width+pad_size] = image
-
-    # 复制上边界
-    padded_image[:pad_size, pad_size:width+pad_size] = image[0, :]
-
-    # 复制下边界
-    padded_image[height+pad_size:, pad_size:width+pad_size] = image[height-1, :]
-
-    # 复制左边界
-    padded_image[pad_size:height+pad_size, :pad_size] = image[:, 0].reshape(height, 1)
-
-    # 复制右边界
-    padded_image[pad_size:height+pad_size, width+pad_size:] = image[:, width-1].reshape(height, 1)
-
-    # 复制四个角
-    padded_image[:pad_size, :pad_size] = image[0, 0]
-    padded_image[:pad_size, width+pad_size:] = image[0, width-1]
-    padded_image[height+pad_size:, :pad_size] = image[height-1, 0]
-    padded_image[height+pad_size:, width+pad_size:] = image[height-1, width-1]
-
-    return padded_image
-
-# 读取图像
-image = cv2.imread('baboon.bmp', 0)  # 以灰度模式读取图像
-
-# 设置补齐大小
-pad_size = 10
-
-# 进行复制填充
-padded_image = copy_padding(image, pad_size)
-m = mean_filter(image,5)
-# 显示图像
-cv2.imshow('Padded Image', padded_image)
-cv2.imshow('m',m)
+    return g
+d = Sobel_edge_detection(image)
+cv2.imshow('d',d)
 cv2.waitKey(0)
-cv2.destroyAllWindows()
+# # 定义高斯滤波器的参数
+# size = 5  # 滤波器大小
+# sigma = 2  # 标准差
+
+# # 创建高斯滤波器
+# x, y = np.meshgrid(np.linspace(-size // 2, size // 2, size), np.linspace(-size // 2, size // 2, size))
+# kernel = np.exp(-(x**2 + y**2) / (2 * sigma**2))
+# kernel /= np.sum(kernel)
+
+# # 应用高斯滤波器
+# filtered_image = scipy.ndimage.convolve(image, kernel)
+# cv2.imshow('Original Image', image)
+# cv2.imshow('Filtered Image', filtered_image)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+# print(5//2)
+# a = [1,2,3]
+# id =1 
+
+# while len(a)>0:
+#     print(a)
+#     a =[]
