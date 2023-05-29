@@ -5,11 +5,12 @@ import scipy.ndimage
 import cv2
 
 # # 读取图像
-image = cv2.imread('peppers.bmp', 0)  # 以灰度模式读取图像
+image = cv2.imread('peppers_0.04.bmp', 0)  # 以灰度模式读取图像
 
 if image is None:
     print("Failed to load image")
     exit()
+image = cv2.GaussianBlur(image,(5,5),1)
 img = sobel_edge_detection(image)
 laplacian_noisy = cv2.Laplacian(img, cv2.CV_64F)
 cv2.imshow("image",image)

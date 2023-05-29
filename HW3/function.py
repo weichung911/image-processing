@@ -80,12 +80,6 @@ def adaptive_median_filter(image):
     return filter_img.astype(np.uint8)
 
 def sobel_edge_detection(image):
-    # Convert the image to grayscale
-    # gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Apply Gaussian blur to reduce noise
-    # blurred_image = cv2.GaussianBlur(image, (3, 3), 0)
-
     # Define the Sobel kernels
     sobel_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
     sobel_y = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
